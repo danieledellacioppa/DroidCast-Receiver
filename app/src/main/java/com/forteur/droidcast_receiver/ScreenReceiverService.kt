@@ -39,19 +39,23 @@ class ScreenReceiverService : Service() {
         try {
             val dataInputStream = DataInputStream(inputStream)
             val size = dataInputStream.readInt()
+            Log.d(TAG, "Expected image data size: $size")
+
             val byteArrayOutputStream = ByteArrayOutputStream()
             val buffer = ByteArray(BUFFER_SIZE)
             var totalBytesRead = 0
             var bytesRead: Int
 
-            // Read the image data based on the size
             while (totalBytesRead < size) {
                 bytesRead = dataInputStream.read(buffer, 0, Math.min(buffer.size, size - totalBytesRead))
                 totalBytesRead += bytesRead
                 byteArrayOutputStream.write(buffer, 0, bytesRead)
+                Log.d(TAG, "Read $bytesRead bytes, total read: $totalBytesRead")
             }
 
             val imageData = byteArrayOutputStream.toByteArray()
+            Log.d(TAG, "Total image data read: ${imageData.size} bytes")
+
             val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
             if (bitmap != null) {
                 MainActivity.bitmapState.value = bitmap
