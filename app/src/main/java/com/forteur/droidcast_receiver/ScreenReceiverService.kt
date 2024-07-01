@@ -69,6 +69,7 @@ class ScreenReceiverService : Service() {
     }
 
 
+
     companion object {
         const val PORT = 12345
         const val BUFFER_SIZE = 1024 * 1024
