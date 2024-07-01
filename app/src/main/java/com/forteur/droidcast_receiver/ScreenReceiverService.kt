@@ -1,15 +1,11 @@
 package com.forteur.droidcast_receiver
-
 import android.app.Service
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.IBinder
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import android.util.Log
 import java.io.InputStream
 import java.net.ServerSocket
-
-import android.util.Log
 
 class ScreenReceiverService : Service() {
     private val TAG = "ScreenReceiverService"
@@ -34,7 +30,7 @@ class ScreenReceiverService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        TODO("Not yet implemented")
+        return null
     }
 
     private fun displayStream(inputStream: InputStream) {
