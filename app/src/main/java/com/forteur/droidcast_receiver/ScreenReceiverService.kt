@@ -41,32 +41,33 @@ class ScreenReceiverService : Service() {
             val size = dataInputStream.readInt()
             Log.d(TAG, "Expected image data size: $size")
 
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            val buffer = ByteArray(BUFFER_SIZE)
+            val imageData = ByteArray(size)
             var totalBytesRead = 0
             var bytesRead: Int
 
             while (totalBytesRead < size) {
-                bytesRead = dataInputStream.read(buffer, 0, Math.min(buffer.size, size - totalBytesRead))
+                bytesRead = dataInputStream.read(imageData, totalBytesRead, size - totalBytesRead)
+                if (bytesRead == -1) break
                 totalBytesRead += bytesRead
-                byteArrayOutputStream.write(buffer, 0, bytesRead)
                 Log.d(TAG, "Read $bytesRead bytes, total read: $totalBytesRead")
             }
 
-            val imageData = byteArrayOutputStream.toByteArray()
-            Log.d(TAG, "Total image data read: ${imageData.size} bytes")
-
-            val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
-            if (bitmap != null) {
-                MainActivity.bitmapState.value = bitmap
-                Log.d(TAG, "Bitmap received and updated")
+            if (totalBytesRead == size) {
+                val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
+                if (bitmap != null) {
+                    MainActivity.bitmapState.value = bitmap
+                    Log.d(TAG, "Bitmap received and updated")
+                } else {
+                    Log.e(TAG, "Failed to decode bitmap")
+                }
             } else {
-                Log.e(TAG, "Failed to decode bitmap")
+                Log.e(TAG, "Incomplete image data received. Expected: $size, Read: $totalBytesRead")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error processing input stream", e)
         }
     }
+
 
     companion object {
         const val PORT = 12345
