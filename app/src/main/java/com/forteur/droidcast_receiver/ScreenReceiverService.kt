@@ -38,17 +38,15 @@ class ScreenReceiverService : Service() {
     private fun displayStream(inputStream: InputStream) {
         try {
             val dataInputStream = DataInputStream(inputStream)
+            val size = dataInputStream.readInt()
             val byteArrayOutputStream = ByteArrayOutputStream()
             val buffer = ByteArray(BUFFER_SIZE)
+            var totalBytesRead = 0
             var bytesRead: Int
 
-            // Read the size of the image data
-            val size = dataInputStream.readInt()
-            var totalBytesRead = 0
-
-            // Read the image data
+            // Read the image data based on the size
             while (totalBytesRead < size) {
-                bytesRead = inputStream.read(buffer, 0, Math.min(buffer.size, size - totalBytesRead))
+                bytesRead = dataInputStream.read(buffer, 0, Math.min(buffer.size, size - totalBytesRead))
                 totalBytesRead += bytesRead
                 byteArrayOutputStream.write(buffer, 0, bytesRead)
             }
