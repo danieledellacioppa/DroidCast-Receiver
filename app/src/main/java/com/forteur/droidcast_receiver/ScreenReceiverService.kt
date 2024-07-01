@@ -4,6 +4,8 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.IBinder
 import android.util.Log
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
 import java.io.InputStream
 import java.net.ServerSocket
 
@@ -34,12 +36,33 @@ class ScreenReceiverService : Service() {
     }
 
     private fun displayStream(inputStream: InputStream) {
-        val bytes = ByteArray(BUFFER_SIZE)
-        var bytesRead: Int
-        while (inputStream.read(bytes).also { bytesRead = it } != -1) {
-            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytesRead)
-            MainActivity.bitmapState.value = bitmap
-            Log.d(TAG, "Bitmap received and updated")
+        try {
+            val dataInputStream = DataInputStream(inputStream)
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            val buffer = ByteArray(BUFFER_SIZE)
+            var bytesRead: Int
+
+            // Read the size of the image data
+            val size = dataInputStream.readInt()
+            var totalBytesRead = 0
+
+            // Read the image data
+            while (totalBytesRead < size) {
+                bytesRead = inputStream.read(buffer, 0, Math.min(buffer.size, size - totalBytesRead))
+                totalBytesRead += bytesRead
+                byteArrayOutputStream.write(buffer, 0, bytesRead)
+            }
+
+            val imageData = byteArrayOutputStream.toByteArray()
+            val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
+            if (bitmap != null) {
+                MainActivity.bitmapState.value = bitmap
+                Log.d(TAG, "Bitmap received and updated")
+            } else {
+                Log.e(TAG, "Failed to decode bitmap")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error processing input stream", e)
         }
     }
 
@@ -48,4 +71,3 @@ class ScreenReceiverService : Service() {
         const val BUFFER_SIZE = 1024 * 1024
     }
 }
-
