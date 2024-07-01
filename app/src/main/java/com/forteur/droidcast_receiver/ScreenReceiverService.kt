@@ -48,3 +48,4 @@ class ScreenReceiverService : Service() {
         const val BUFFER_SIZE = 1024 * 1024
     }
 }
+
