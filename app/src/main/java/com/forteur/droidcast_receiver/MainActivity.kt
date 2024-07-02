@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.forteur.droidcast_receiver.ui.theme.DroidCastReceiverTheme
 
 class MainActivity : ComponentActivity() {
@@ -45,11 +47,16 @@ class MainActivity : ComponentActivity() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Gray),
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Color(0xFF3A3A3A), Color(0xFF1A1A1A))
+                            )
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
                         if (bitmapState.value != null) {
                             Image(
@@ -67,19 +74,12 @@ class MainActivity : ComponentActivity() {
                                     fontFamily = MinecraftFontFamily,
                                     shadow = Shadow(
                                         color = Color.Black,
-                                        offset = Offset(2f, 2f),
-                                        blurRadius = 3f
+                                        offset = Offset(4f, 4f),
+                                        blurRadius = 8f
                                     )
                                 )
                             )
-                        }
-                        if (bitmapState.value != null) {
-                            Image(
-                                bitmap = bitmapState.value!!.asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        } else {
+                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "Waiting for image data...",
                                 textAlign = TextAlign.Center,
@@ -89,10 +89,26 @@ class MainActivity : ComponentActivity() {
                                     fontFamily = MinecraftFontFamily,
                                     shadow = Shadow(
                                         color = Color.Black,
-                                        offset = Offset(2f, 2f),
-                                        blurRadius = 3f
+                                        offset = Offset(4f, 4f),
+                                        blurRadius = 8f
                                     )
                                 )
+                            )
+                            Spacer(modifier = Modifier.height(32.dp))
+                            Text(
+                                text = "Ensure that you have DroidCast-Projector installed on the casting device.",
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontFamily = FontFamily.Default,
+                                    shadow = Shadow(
+                                        color = Color.Black,
+                                        offset = Offset(2f, 2f),
+                                        blurRadius = 4f
+                                    )
+                                ),
+                                modifier = Modifier.padding(horizontal = 32.dp)
                             )
                         }
                     }
@@ -121,11 +137,16 @@ fun DefaultPreview() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Gray),
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFF3A3A3A), Color(0xFF1A1A1A))
+                    )
+                ),
             contentAlignment = Alignment.Center
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = "Receiver IP: 0.0.0.0",
@@ -136,11 +157,12 @@ fun DefaultPreview() {
                         fontFamily = MinecraftFontFamily,
                         shadow = Shadow(
                             color = Color.Black,
-                            offset = Offset(2f, 2f),
-                            blurRadius = 3f
+                            offset = Offset(4f, 4f),
+                            blurRadius = 8f
                         )
                     )
                 )
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Waiting for image data...",
                     textAlign = TextAlign.Center,
@@ -150,10 +172,26 @@ fun DefaultPreview() {
                         fontFamily = MinecraftFontFamily,
                         shadow = Shadow(
                             color = Color.Black,
-                            offset = Offset(2f, 2f),
-                            blurRadius = 3f
+                            offset = Offset(4f, 4f),
+                            blurRadius = 8f
                         )
                     )
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+                Text(
+                    text = "Ensure that you have DroidCast-Projector installed on the casting device.",
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily.Default,
+                        shadow = Shadow(
+                            color = Color.Black,
+                            offset = Offset(2f, 2f),
+                            blurRadius = 4f
+                        )
+                    ),
+                    modifier = Modifier.padding(horizontal = 32.dp)
                 )
             }
         }
