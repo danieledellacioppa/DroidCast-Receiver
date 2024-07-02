@@ -59,12 +59,6 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.screencast_idea),
-                            contentDescription = "Screencast Idea",
-                            modifier = Modifier.size(128.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
                         if (bitmapState.value != null) {
                             Image(
                                 bitmap = bitmapState.value!!.asImageBitmap(),
@@ -72,6 +66,12 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxSize()
                             )
                         } else {
+                            Image(
+                                painter = painterResource(id = R.drawable.screencast_idea),
+                                contentDescription = "Screencast Idea",
+                                modifier = Modifier.size(128.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "Receiver IP: $ipAddress",
                                 textAlign = TextAlign.Center,
