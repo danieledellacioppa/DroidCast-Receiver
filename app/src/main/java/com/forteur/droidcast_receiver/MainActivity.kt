@@ -51,20 +51,28 @@ class MainActivity : ComponentActivity() {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Receiver IP: $ipAddress",
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(
-                                color = Color.Yellow,
-                                fontSize = 20.sp,
-                                fontFamily = MinecraftFontFamily,
-                                shadow = Shadow(
-                                    color = Color.Black,
-                                    offset = Offset(2f, 2f),
-                                    blurRadius = 3f
+                        if (bitmapState.value != null) {
+                            Image(
+                                bitmap = bitmapState.value!!.asImageBitmap(),
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        } else {
+                            Text(
+                                text = "Receiver IP: $ipAddress",
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(
+                                    color = Color.Yellow,
+                                    fontSize = 20.sp,
+                                    fontFamily = MinecraftFontFamily,
+                                    shadow = Shadow(
+                                        color = Color.Black,
+                                        offset = Offset(2f, 2f),
+                                        blurRadius = 3f
+                                    )
                                 )
                             )
-                        )
+                        }
                         if (bitmapState.value != null) {
                             Image(
                                 bitmap = bitmapState.value!!.asImageBitmap(),
