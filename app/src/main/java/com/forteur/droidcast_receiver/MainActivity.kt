@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.fontResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -58,6 +59,12 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.screencast_idea),
+                            contentDescription = "Screencast Idea",
+                            modifier = Modifier.size(128.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
                         if (bitmapState.value != null) {
                             Image(
                                 bitmap = bitmapState.value!!.asImageBitmap(),
@@ -70,7 +77,7 @@ class MainActivity : ComponentActivity() {
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(
                                     color = Color.Yellow,
-                                    fontSize = 20.sp,
+                                    fontSize = 12.sp,
                                     fontFamily = MinecraftFontFamily,
                                     shadow = Shadow(
                                         color = Color.Black,
@@ -85,7 +92,7 @@ class MainActivity : ComponentActivity() {
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(
                                     color = Color.Yellow,
-                                    fontSize = 20.sp,
+                                    fontSize = 12.sp,
                                     fontFamily = MinecraftFontFamily,
                                     shadow = Shadow(
                                         color = Color.Black,
@@ -148,12 +155,18 @@ fun DefaultPreview() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.screencast_idea),
+                    contentDescription = "Screencast Idea",
+                    modifier = Modifier.size(128.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Receiver IP: 0.0.0.0",
                     textAlign = TextAlign.Center,
                     style = TextStyle(
                         color = Color.Yellow,
-                        fontSize = 20.sp,
+                        fontSize = 12.sp,
                         fontFamily = MinecraftFontFamily,
                         shadow = Shadow(
                             color = Color.Black,
@@ -168,7 +181,7 @@ fun DefaultPreview() {
                     textAlign = TextAlign.Center,
                     style = TextStyle(
                         color = Color.Yellow,
-                        fontSize = 20.sp,
+                        fontSize = 12.sp,
                         fontFamily = MinecraftFontFamily,
                         shadow = Shadow(
                             color = Color.Black,
