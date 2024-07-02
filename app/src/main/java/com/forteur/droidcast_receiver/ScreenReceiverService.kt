@@ -2,7 +2,9 @@ package com.forteur.droidcast_receiver
 import android.app.Service
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -11,6 +13,9 @@ import java.net.ServerSocket
 
 class ScreenReceiverService : Service() {
     private val TAG = "ScreenReceiverService"
+    private val TIMEOUT: Long = 5000 // 5 seconds
+    private var timeoutHandler: Handler? = null
+    private var timeoutRunnable: Runnable? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Thread {
@@ -36,6 +41,7 @@ class ScreenReceiverService : Service() {
     }
 
     private fun displayStream(inputStream: InputStream) {
+        resetTimeout()
         try {
             val dataInputStream = DataInputStream(inputStream)
             val size = dataInputStream.readInt()
@@ -57,6 +63,7 @@ class ScreenReceiverService : Service() {
                 if (bitmap != null) {
                     MainActivity.bitmapState.value = bitmap
                     Log.d(TAG, "Bitmap received and updated")
+                    resetTimeout()
                 } else {
                     Log.e(TAG, "Failed to decode bitmap")
                 }
@@ -68,10 +75,18 @@ class ScreenReceiverService : Service() {
         }
     }
 
-
+    private fun resetTimeout() {
+        timeoutRunnable?.let { timeoutHandler?.removeCallbacks(it) }
+        timeoutHandler = Handler(Looper.getMainLooper())
+        timeoutRunnable = Runnable {
+            MainActivity.bitmapState.value = null
+        }
+        timeoutHandler?.postDelayed(timeoutRunnable!!, TIMEOUT)
+    }
 
     companion object {
         const val PORT = 12345
         const val BUFFER_SIZE = 1024 * 1024
     }
 }
+
