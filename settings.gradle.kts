@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DroidCast-Receiver"
+rootProject.name = "Cast Receiver"
 include(":app")
  
