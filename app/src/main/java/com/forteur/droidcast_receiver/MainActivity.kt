@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
                             )
                             Spacer(modifier = Modifier.height(32.dp))
                             Text(
-                                text = "Ensure that you have DroidCast-Projector installed on the casting device.",
+                                text = "Ensure that you have DroidCast-Projector installed on the casting device!!!",
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(
                                     color = Color.White,
