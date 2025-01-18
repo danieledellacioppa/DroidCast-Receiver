@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -41,6 +42,9 @@ class MainActivity : ComponentActivity() {
         val bitmapState = mutableStateOf<Bitmap?>(null)
     }
 
+    private var apkServer: ApkServer? = null
+    private val serverPort = 8080
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -50,9 +54,26 @@ class MainActivity : ComponentActivity() {
 
         val ipAddress = getIPAddress()
 
+        // Copy the APK from /res/raw to the cache directory
+        val apkFile = File(cacheDir, "droidcast_projector.apk")
+        Log.d("MainActivity", "APK file path: ${apkFile.absolutePath}")
+
+        resources.openRawResource(R.raw.droidcast_projector).use { input ->
+            FileOutputStream(apkFile).use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        // Start the HTTP server
+        apkServer = ApkServer(this, serverPort)
+        apkServer?.start()
+
+        val downloadLink = "http://$ipAddress:$serverPort"
+
+
         setContent {
             DroidCastReceiverTheme {
-                val apkUri = getApkUri().toString()
+//                val apkUri = getApkUri().toString()
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -125,7 +146,7 @@ class MainActivity : ComponentActivity() {
                                 ),
                                 modifier = Modifier.padding(horizontal = 32.dp)
                             )
-                            ApkQrCode(apkUri)
+                            ApkQrCode(downloadLink)
                             Spacer(modifier = Modifier.height(32.dp))
                             Text(
                                 text = "Scan to download DroidCast-Projector",
@@ -187,8 +208,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ApkQrCode(apkUri: String) {
-    val qrBitmap = generateQrCodeBitmap(apkUri)
+fun ApkQrCode(downloadLink: String) {
+    val qrBitmap = generateQrCodeBitmap(downloadLink)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -307,3 +328,5 @@ fun DefaultPreview() {
 val MinecraftFontFamily = FontFamily(
     Font(R.font.minecraft)
 )
+
+
