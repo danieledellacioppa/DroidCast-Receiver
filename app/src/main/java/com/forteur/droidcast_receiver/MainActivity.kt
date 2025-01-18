@@ -56,16 +56,25 @@ class MainActivity : ComponentActivity() {
 
         // Copy the APK from /res/raw to the cache directory
         val apkFile = File(cacheDir, "droidcast_projector.apk")
-        Log.d("MainActivity", "APK file path: ${apkFile.absolutePath}")
-
-        resources.openRawResource(R.raw.droidcast_projector).use { input ->
-            FileOutputStream(apkFile).use { output ->
-                input.copyTo(output)
+        if (!apkFile.exists()) {
+            Log.d("MainActivity", "APK file does not exist")
+            Log.d("MainActivity", "Copying APK file to cache directory")
+            resources.openRawResource(R.raw.droidcast_projector).use { input ->
+                FileOutputStream(apkFile).use { output ->
+                    input.copyTo(output)
+                }
             }
         }
+        Log.d("MainActivity", "APK file path: ${apkFile.absolutePath}")
+
+//        resources.openRawResource(R.raw.droidcast_projector).use { input ->
+//            FileOutputStream(apkFile).use { output ->
+//                input.copyTo(output)
+//            }
+//        }
 
         // Start the HTTP server
-        apkServer = ApkServer(this, serverPort)
+        apkServer = ApkServer(this, serverPort, apkFile)
         apkServer?.start()
 
         val downloadLink = "http://$ipAddress:$serverPort"
