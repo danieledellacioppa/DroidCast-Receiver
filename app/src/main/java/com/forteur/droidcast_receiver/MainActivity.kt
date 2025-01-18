@@ -2,6 +2,7 @@ package com.forteur.droidcast_receiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -27,7 +29,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import com.forteur.droidcast_receiver.ui.theme.DroidCastReceiverTheme
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
+import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -45,6 +52,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             DroidCastReceiverTheme {
+                val apkUri = getApkUri().toString()
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -117,6 +125,21 @@ class MainActivity : ComponentActivity() {
                                 ),
                                 modifier = Modifier.padding(horizontal = 32.dp)
                             )
+                            ApkQrCode(apkUri)
+                            Spacer(modifier = Modifier.height(32.dp))
+                            Text(
+                                text = "Scan to download DroidCast-Projector",
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    shadow = Shadow(
+                                        color = Color.Black,
+                                        offset = Offset(2f, 2f),
+                                        blurRadius = 4f
+                                    )
+                                )
+                            )
                         }
                     }
                 }
@@ -135,7 +158,77 @@ class MainActivity : ComponentActivity() {
             (ipAddress shr 24 and 0xff)
         )
     }
+
+    private fun copyApkToPublicDir() {
+        val rawApk = resources.openRawResource(R.raw.droidcast_projector)
+        val outputFile = File(getRawFilePath(), "droidcast_projector.apk")
+        rawApk.use { input ->
+            FileOutputStream(outputFile).use { output ->
+                input.copyTo(output)
+            }
+        }
+    }
+
+
+    private fun getApkUri(): Uri {
+        val file = File(getRawFilePath(), "droidcast_projector.apk")
+        return FileProvider.getUriForFile(
+            this,
+            "${applicationContext.packageName}.fileprovider",
+            file
+        )
+    }
+
+    private fun getRawFilePath(): File {
+        return File(applicationContext.getExternalFilesDir(null), "raw").apply {
+            if (!exists()) mkdirs()
+        }
+    }
 }
+
+@Composable
+fun ApkQrCode(apkUri: String) {
+    val qrBitmap = generateQrCodeBitmap(apkUri)
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        qrBitmap?.let {
+            Image(
+                bitmap = it.asImageBitmap(),
+                contentDescription = "QR Code",
+                modifier = Modifier.size(200.dp)
+            )
+        }
+        Text(
+            text = "Scan to Download DroidCast-Projector",
+            color = Color.White,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+private fun generateQrCodeBitmap(text: String): Bitmap? {
+    return try {
+        val qrCodeWriter = QRCodeWriter()
+        val bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 512, 512)
+        val width = bitMatrix.width
+        val height = bitMatrix.height
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.Black.toArgb() else Color.White.toArgb())
+            }
+        }
+        bitmap
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
