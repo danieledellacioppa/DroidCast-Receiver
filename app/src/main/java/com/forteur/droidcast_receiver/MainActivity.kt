@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Receiver IP: $ipAddress",
+                                text = "New Receiver IP: $ipAddress",
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(
                                     color = Color.Yellow,
