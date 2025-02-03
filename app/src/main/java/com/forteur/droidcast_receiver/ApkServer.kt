@@ -15,7 +15,7 @@ class ApkServer(private val context: Context, port: Int,  private val apkFile: F
                 "application/vnd.android.package-archive",
                 fis
             )
-            response.addHeader("Content-Disposition", "attachment; filename=\"droidcast_projector.apk\"")
+            response.addHeader("Content-Disposition", "attachment; filename=\"droidcast_projector2.apk\"")
             response
         } else {
             Log.e("ApkServer", "APK file not found")

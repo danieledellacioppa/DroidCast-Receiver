@@ -55,11 +55,11 @@ class MainActivity : ComponentActivity() {
         val ipAddress = getIPAddress()
 
         // Copy the APK from /res/raw to the cache directory
-        val apkFile = File(cacheDir, "droidcast_projector.apk")
+        val apkFile = File(cacheDir, "droidcast_projector2.apk")
         if (!apkFile.exists()) {
             Log.d("MainActivity", "APK file does not exist")
             Log.d("MainActivity", "Copying APK file to cache directory")
-            resources.openRawResource(R.raw.droidcast_projector).use { input ->
+            resources.openRawResource(R.raw.droidcast_projector2).use { input ->
                 FileOutputStream(apkFile).use { output ->
                     input.copyTo(output)
                 }
@@ -126,7 +126,7 @@ class MainActivity : ComponentActivity() {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "-:Waiting for image data:-",
+                                text = "...Waiting for image data...",
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(
                                     color = Color.Yellow,
@@ -190,8 +190,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun copyApkToPublicDir() {
-        val rawApk = resources.openRawResource(R.raw.droidcast_projector)
-        val outputFile = File(getRawFilePath(), "droidcast_projector.apk")
+        val rawApk = resources.openRawResource(R.raw.droidcast_projector2)
+        val outputFile = File(getRawFilePath(), "droidcast_projector2.apk")
         rawApk.use { input ->
             FileOutputStream(outputFile).use { output ->
                 input.copyTo(output)
@@ -201,7 +201,7 @@ class MainActivity : ComponentActivity() {
 
 
     private fun getApkUri(): Uri {
-        val file = File(getRawFilePath(), "droidcast_projector.apk")
+        val file = File(getRawFilePath(), "droidcast_projector2.apk")
         return FileProvider.getUriForFile(
             this,
             "${applicationContext.packageName}.fileprovider",
