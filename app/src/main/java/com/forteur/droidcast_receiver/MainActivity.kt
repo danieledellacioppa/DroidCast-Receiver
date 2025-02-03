@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Neo Receiver IP: $ipAddress",
+                                text = "Receiver IP: $ipAddress",
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(
                                     color = Color.Yellow,
@@ -126,7 +126,7 @@ class MainActivity : ComponentActivity() {
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Waiting for image data...",
+                                text = "-:Waiting for image data:-",
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(
                                     color = Color.Yellow,
