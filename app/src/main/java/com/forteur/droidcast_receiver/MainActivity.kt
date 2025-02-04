@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -39,6 +40,7 @@ import java.io.FileOutputStream
 
 class MainActivity : ComponentActivity() {
     companion object {
+        val orientationState: MutableState<Int> = mutableIntStateOf(0)
         val bitmapState = mutableStateOf<Bitmap?>(null)
     }
 
@@ -82,7 +84,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             DroidCastReceiverTheme {
-//                val apkUri = getApkUri().toString()
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -98,10 +100,15 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center
                     ) {
                         if (bitmapState.value != null) {
+                            val aspectRatio = bitmapState.value!!.width.toFloat() / bitmapState.value!!.height
+
                             Image(
                                 bitmap = bitmapState.value!!.asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize()
+                                contentDescription = "Screen Cast",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(aspectRatio),
+                                contentScale = ContentScale.Fit
                             )
                         } else {
                             Image(

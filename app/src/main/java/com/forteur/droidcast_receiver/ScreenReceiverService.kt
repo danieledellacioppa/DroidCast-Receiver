@@ -44,6 +44,8 @@ class ScreenReceiverService : Service() {
         resetTimeout()
         try {
             val dataInputStream = DataInputStream(inputStream)
+            // Legge il flag dell'orientamento inviato dal projector
+            val orientationFlag = dataInputStream.readInt()
             val size = dataInputStream.readInt()
             Log.d(TAG, "Expected image data size: $size")
 
@@ -62,7 +64,8 @@ class ScreenReceiverService : Service() {
                 val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
                 if (bitmap != null) {
                     MainActivity.bitmapState.value = bitmap
-                    Log.d(TAG, "Bitmap received and updated")
+                    MainActivity.orientationState.value = orientationFlag
+                    Log.d(TAG, "Bitmap received and updated, orientation: $orientationFlag")
                     resetTimeout()
                 } else {
                     Log.e(TAG, "Failed to decode bitmap")
