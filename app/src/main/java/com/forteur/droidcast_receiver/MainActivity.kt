@@ -102,14 +102,30 @@ class MainActivity : ComponentActivity() {
                         if (bitmapState.value != null) {
                             val aspectRatio = bitmapState.value!!.width.toFloat() / bitmapState.value!!.height
 
-                            Image(
-                                bitmap = bitmapState.value!!.asImageBitmap(),
-                                contentDescription = "Screen Cast",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(aspectRatio),
-                                contentScale = ContentScale.Fit
-                            )
+                            when (orientationState.value) {
+                                0 -> {
+                                    Image(
+                                        bitmap = bitmapState.value!!.asImageBitmap(),
+                                        contentDescription = "Screen Cast",
+                                        modifier = Modifier
+//                                    .fillMaxWidth()
+                                            .aspectRatio(aspectRatio),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                                1 -> {
+                                    Image(
+                                        bitmap = bitmapState.value!!.asImageBitmap(),
+                                        contentDescription = "Screen Cast",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(aspectRatio),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                }
+                            }
+
+
                         } else {
                             Image(
                                 painter = painterResource(id = R.drawable.screencast_idea),
