@@ -13,7 +13,7 @@ import java.net.ServerSocket
 
 class ScreenReceiverService : Service() {
     private val TAG = "ScreenReceiverService"
-    private val TIMEOUT: Long = 5000 // 5 seconds
+    private val TIMEOUT: Long = 60000 // 1 minute
     private var timeoutHandler: Handler? = null
     private var timeoutRunnable: Runnable? = null
 
