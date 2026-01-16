@@ -201,16 +201,39 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun getIPAddress(): String {
-        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val ipAddress = wifiManager.connectionInfo.ipAddress
-        return String.format(
-            "%d.%d.%d.%d",
-            (ipAddress and 0xff),
-            (ipAddress shr 8 and 0xff),
-            (ipAddress shr 16 and 0xff),
-            (ipAddress shr 24 and 0xff)
-        )
+        val preferredIfaces = listOf("wlan", "ap", "softap", "rndis", "eth")
+
+        try {
+            val ifaces = java.net.NetworkInterface.getNetworkInterfaces().toList()
+                .filter { it.isUp && !it.isLoopback }
+
+            fun pickFrom(list: List<java.net.NetworkInterface>): String? {
+                for (ni in list) {
+                    for (addr in ni.inetAddresses.toList()) {
+                        if (!addr.isLoopbackAddress && addr is java.net.Inet4Address) {
+                            return addr.hostAddress
+                        }
+                    }
+                }
+                return null
+            }
+
+            // 1) prova interfacce "preferite"
+            for (prefix in preferredIfaces) {
+                val match = ifaces.filter { it.name.startsWith(prefix) }
+                pickFrom(match)?.let { return it }
+            }
+
+            // 2) fallback: prima IPv4 valida
+            pickFrom(ifaces)?.let { return it }
+
+        } catch (e: Exception) {
+            Log.e("IP", "Failed to get IP address", e)
+        }
+
+        return "0.0.0.0"
     }
+
 
     private fun copyApkToPublicDir() {
         val rawApk = resources.openRawResource(R.raw.droidcast_projector3)
