@@ -1,81 +1,85 @@
 #!/bin/bash
+set -e
 
-# Configurazione del nuovo dispositivo connesso via ID
+# ==============================================================================
+# DroidCast Receiver - build/install/push (InkFloat-style)
+# ==============================================================================
+
+# Dispositivo principale (pannello / receiver) dove installi l'app receiver
 DEVICE_ID="an4009059505841100406"
 
-#BUILD_DATE=$(date -u +"%Y-%m-%dT%H-%MZ")
-#BUILD_CLASS_PATH="$HOME/akhter/Touchscreen-Lockdown/app/Neo-Launcher/Omega/src/com/akhter/aosplauncher/compose/pages/preferences/Build.kt"
+# Telefono Android che fa da "APK server" (quello che deve ricevere l'APK via push)
+APK_SERVER_ID="ZY3275T8QC"
+
+# Dove pushare l'APK sul telefono server (modifica se la tua app server usa un path diverso)
+REMOTE_PATH="/storage/emulated/0/Android/data/com.forteur.launcherupdateserverforandroid/files/apk_files/"
+
+# Nome finale dell'APK sul server (scegli tu)
+REMOTE_APK_NAME="com.forteur.droidcast_receiver.apk"
 
 # Parametro di ingresso
 SKIP_INSTALLATION=false
 TARGET_MODE=""
-if [ "$1" == "no-install" ]; then
+if [ "${1:-}" == "no-install" ]; then
   SKIP_INSTALLATION=true
-  TARGET_MODE="$2"
+  TARGET_MODE="${2:-}"
 fi
 
 # Verifica se JAVA_HOME è impostato
-if [ -z "$JAVA_HOME" ]; then
+if [ -z "${JAVA_HOME:-}" ]; then
   echo "JAVA_HOME non è impostato. Eseguo l'export..."
   export JAVA_HOME="/home/daniele/android-studio/jbr"
   export PATH="$PATH:$JAVA_HOME/bin"
 fi
 
-# Genera la classe Build.kt
-#cat > "$BUILD_CLASS_PATH" <<EOL
-#package com.akhter.aosplauncher.compose.pages.preferences
-#
-#object Build {
-#    const val DATE = "$BUILD_DATE"
-#}
-#EOL
-
-#echo "Classe Build.kt generata con successo in $BUILD_CLASS_PATH con data: $BUILD_DATE"
-
-# Imposta la data come variabile di ambiente per la build
-#export PRE_BUILD_DATE="$BUILD_DATE"
-#echo "Pre Build date set to: $PRE_BUILD_DATE"
-
 # Esegui la build con l'opzione per mostrare le deprecazioni
-./gradlew assembleDebug --warning-mode all # -PpreBuildDate="$PRE_BUILD_DATE"
+./gradlew assembleDebug --warning-mode all
 
-# Verifica il codice di uscita della build
-build_exit_code=$?
+echo "Build completata con successo!"
 
-if [ $build_exit_code -eq 0 ]; then
-  echo "Build completata con successo!"
+# Trova l'APK più recente nella directory DEL PROGETTO CORRENTE (non InkFloat)
+APK_DIR="./app/build/outputs/apk/debug"
+APK_PATH=$(find "$APK_DIR" -type f -name "*.apk" | sort | tail -n 1)
 
-# Trova l'APK più recente che inizia con AkhterSecureLauncher
-  APK_PATH=$(find $HOME/repo/DroidCast-Receiver/app/build/outputs/apk/debug/ -type f -name "app*.apk" | sort | tail -n 1)
-
-  if [ -n "$APK_PATH" ]; then
-    echo "APK trovata: $APK_PATH"
-
-    # Verifica se bisogna saltare l'installazione
-    if [ "$SKIP_INSTALLATION" = true ]; then
-      if [ "$TARGET_MODE" == "server" ]; then
-        # Rinomina l'APK e spostalo nella cartella destinazione
-        DEST_DIR="$HOME/akhter/Touchscreen-Lockdown/app/LauncherUpdateServer/apk_files"
-        mkdir -p "$DEST_DIR"
-        DEST_APK="$DEST_DIR/com.forteur.droidcast_receiver.apk"
-        mv "$APK_PATH" "$DEST_APK"
-        echo "APK rinominata e spostata in: $DEST_APK"
-      else
-        echo "Installazione saltata su richiesta."
-      fi
-    else  
-        # Se la variabile di ambiente DEBUG è impostata su "true", esegui il debug
-        if [ "$DEBUG" = "true" ]; then
-          echo "Esecuzione in modalità debug..."
-          adb -s "$DEVICE_ID" shell am start -D -n "com.forteur.droidcast_receiver/.MainActivity"
-        else
-          # Altrimenti, esegui l'installazione normale
-          adb -s "$DEVICE_ID" install -r "$APK_PATH"
-        fi
-    fi
-  else
-    echo "Errore: Nessun APK trovato con il prefisso app."
-  fi
-else
-  echo "La build ha avuto errori. L'installazione non verrà effettuata..."
+if [ -z "$APK_PATH" ]; then
+  echo "Errore: Nessun APK trovato in: $APK_DIR"
+  exit 1
 fi
+
+echo "APK trovata: $APK_PATH"
+
+# Verifica se bisogna saltare l'installazione
+if [ "$SKIP_INSTALLATION" = true ]; then
+  if [ "$TARGET_MODE" == "server" ]; then
+    echo "Modalità server: push dell'APK al telefono server..."
+
+    # (Opzionale) Copia in una dir locale per tenere traccia dell'ultima APK buildata
+    DEST_DIR="$HOME/akhter/DroidCast/apk_files"
+    mkdir -p "$DEST_DIR"
+    DEST_APK="$DEST_DIR/$REMOTE_APK_NAME"
+    cp "$APK_PATH" "$DEST_APK"
+    echo "APK copiata in: $DEST_APK"
+
+    # Assicura dir remota e pusha
+    echo "Creazione directory remota (se manca): $REMOTE_PATH"
+    adb -s "$APK_SERVER_ID" shell "mkdir -p \"$REMOTE_PATH\""
+
+    echo "Pushing APK to device at: $REMOTE_PATH"
+    adb -s "$APK_SERVER_ID" push "$DEST_APK" "$REMOTE_PATH"
+
+    echo "✅ Push completato."
+  else
+    echo "Installazione saltata su richiesta."
+  fi
+
+else
+  # Se DEBUG=true, avvia in debug, altrimenti install normale
+  if [ "${DEBUG:-}" = "true" ]; then
+    echo "Esecuzione in modalità debug..."
+    adb -s "$DEVICE_ID" shell am start -D -n "com.forteur.droidcast_receiver/.MainActivity"
+  else
+    echo "Installazione su device receiver: $DEVICE_ID"
+    adb -s "$DEVICE_ID" install -r "$APK_PATH"
+  fi
+fi
+
